@@ -18,60 +18,57 @@
     h1 {
       text-align: center;
     }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      background-color: #0078d7;
+      color: white;
+      border-radius: 5px;
+    }
+    button:active {
+      background-color: #005bb5;
+    }
     .status {
       margin-top: 20px;
       font-size: 18px;
+      color: red;
     }
   </style>
 </head>
 <body>
-  <h1>Shake Your Phone</h1>
-  <div class="status">Keep shaking your phone to vibrate!</div>
+  <h1>Test Vibration</h1>
+  <button id="vibrateButton">Vibrate</button>
+  <div class="status"></div>
 
   <script>
     // Ініціалізація Telegram Web App
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    // Перевіряємо, чи пристрій підтримує вібрацію
+    const statusDiv = document.querySelector('.status');
+    const vibrateButton = document.getElementById('vibrateButton');
+
+    // Перевіряємо підтримку вібрації
     if (!navigator.vibrate) {
-      document.querySelector('.status').textContent = "Your device doesn't support vibration.";
-      throw new Error("Vibration API is not supported on this device.");
+      statusDiv.textContent = "Your device doesn't support vibration.";
     }
 
-    // Слухач для руху пристрою
-    let isShaking = false;
-    let lastTime = 0;
-    const shakeThreshold = 15; // Порог для вібрації (чим нижче, тим чутливіше)
-    
-    window.addEventListener('devicemotion', (event) => {
-      const acceleration = event.accelerationIncludingGravity;
-
-      if (!acceleration) return;
-
-      // Визначаємо силу руху
-      const totalForce = Math.sqrt(
-        acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
-      );
-
-      const currentTime = new Date().getTime();
-
-      if (totalForce > shakeThreshold && currentTime - lastTime > 200) {
-        lastTime = currentTime;
-
-        if (!isShaking) {
-          isShaking = true;
-          navigator.vibrate(200); // Вібрація 200 мс
-        }
+    // Обробка натискання на кнопку
+    vibrateButton.addEventListener('click', () => {
+      if (navigator.vibrate) {
+        navigator.vibrate(200); // Вібрація на 200 мс
+        statusDiv.textContent = "Vibrating!";
       } else {
-        isShaking = false;
+        statusDiv.textContent = "Vibration API is not supported on this device.";
       }
     });
 
-    // Перевіряємо, чи відкрито в Telegram
+    // Перевіряємо, чи відкрито в Telegram і на мобільному
     if (!tg.initData || tg.platform !== 'mobile') {
-      document.querySelector('.status').textContent = "This feature works only on mobile in Telegram.";
-      throw new Error("Not running on mobile Telegram.");
+      statusDiv.textContent = "This feature works only on mobile in Telegram.";
     }
   </script>
 </body>
