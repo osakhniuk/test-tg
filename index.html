@@ -34,12 +34,11 @@
     .status {
       margin-top: 20px;
       font-size: 18px;
-      color: red;
     }
   </style>
 </head>
 <body>
-  <h1>Test Vibration</h1>
+  <h1>Test Vibration with Telegram API</h1>
   <button id="vibrateButton">Vibrate</button>
   <div class="status"></div>
 
@@ -51,24 +50,19 @@
     const statusDiv = document.querySelector('.status');
     const vibrateButton = document.getElementById('vibrateButton');
 
-    // Перевіряємо підтримку вібрації
-    if (!navigator.vibrate) {
-      statusDiv.textContent = "Your device doesn't support vibration.";
-    }
-
     // Обробка натискання на кнопку
     vibrateButton.addEventListener('click', () => {
-      if (navigator.vibrate) {
-        navigator.vibrate(200); // Вібрація на 200 мс
-        statusDiv.textContent = "Vibrating!";
-      } else {
-        statusDiv.textContent = "Vibration API is not supported on this device.";
+      try {
+        tg.HapticFeedback.impactOccurred("medium"); // Викликаємо середню вібрацію
+        statusDiv.textContent = "Vibration triggered via Telegram API!";
+      } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
       }
     });
 
-    // Перевіряємо, чи відкрито в Telegram і на мобільному
-    if (!tg.initData || tg.platform !== 'mobile') {
-      statusDiv.textContent = "This feature works only on mobile in Telegram.";
+    // Перевірка середовища Telegram
+    if (!tg.initData) {
+      statusDiv.textContent = "This feature works only in Telegram.";
     }
   </script>
 </body>
