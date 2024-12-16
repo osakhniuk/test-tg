@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shake Your Phone</h1>
+  <div class="status">Keep shaking your phone to vibrate!</div>
+
+  <script>
+    // Ініціалізація Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+
+    // Перевіряємо, чи пристрій підтримує вібрацію
+    if (!navigator.vibrate) {
+      document.querySelector('.status').textContent = "Your device doesn't support vibration.";
+      throw new Error("Vibration API is not supported on this device.");
+    }
+
+    // Слухач для руху пристрою
+    let isShaking = false;
+    let lastTime = 0;
+    const shakeThreshold = 15; // Порог для вібрації (чим нижче, тим чутливіше)
+    
+    window.addEventListener('devicemotion', (event) => {
+      const acceleration = event.accelerationIncludingGravity;
+
+      if (!acceleration) return;
+
+      // Визначаємо силу руху
+      const totalForce = Math.sqrt(
+        acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
+      );
+
+      const currentTime = new Date().getTime();
+
+      if (totalForce > shakeThreshold && currentTime - lastTime > 200) {
+        lastTime = currentTime;
+
+        if (!isShaking) {
+          isShaking = true;
+          navigator.vibrate(200); // Вібрація 200 мс
+        }
+      } else {
+        isShaking = false;
+      }
+    });
+
+    // Перевіряємо, чи відкрито в Telegram
+    if (!tg.initData || tg.platform !== 'mobile') {
+      document.querySelector('.status').textContent = "This feature works only on mobile in Telegram.";
+      throw new Error("Not running on mobile Telegram.");
+    }
+  </script>
+</body>
+</html>
