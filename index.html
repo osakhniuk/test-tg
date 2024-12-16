@@ -36,12 +36,6 @@
 
     const statusDiv = document.querySelector('.status');
 
-    // Перевіряємо підтримку сенсорів
-    if (!window.DeviceMotionEvent) {
-      statusDiv.textContent = "Device motion is not supported on your device.";
-      throw new Error("DeviceMotionEvent is not supported.");
-    }
-
     // Параметри для обробки струшування
     let lastShakeTime = 0;
     const shakeThreshold = 15; // Порог для чутливості
@@ -65,19 +59,10 @@
         lastShakeTime = currentTime;
 
         // Викликаємо тактильний відгук через Telegram API
-        try {
-          tg.HapticFeedback.impactOccurred("medium"); // Середня вібрація
-          statusDiv.textContent = "Shake detected! Vibrating...";
-        } catch (error) {
-          statusDiv.textContent = `Error: ${error.message}`;
-        }
+        tg.HapticFeedback.impactOccurred("medium"); // Середня вібрація
+        statusDiv.textContent = "Shake detected! Vibrating...";
       }
     });
-
-    // Перевірка, чи працює в Telegram
-    if (!tg.initData || tg.platform !== 'mobile') {
-      statusDiv.textContent = "This feature works only on mobile in Telegram.";
-    }
   </script>
 </body>
 </html>
