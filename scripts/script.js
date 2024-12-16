@@ -10,6 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
   startButton.addEventListener("click", async () => {
     console.log("START button clicked!");
 
+    // Запит дозволу на доступ до гіроскопа (для iOS)
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+      try {
+        const permissionState = await DeviceMotionEvent.requestPermission();
+        if (permissionState === "granted") {
+          console.log("Gyroscope permission granted!");
+          startGame();
+        } else {
+          alert("Permission to access gyroscope was denied.");
+        }
+      } catch (error) {
+        console.error("Error while requesting permission:", error);
+        alert("Error while requesting gyroscope permission.");
+      }
+    } else {
+      // Для Android та платформ, де не потрібен запит дозволу
+      console.log("Gyroscope permission not required.");
+      startGame();
+    }
+  });
+
+  function startGame() {
     // Показуємо рахунок
     scoreContainer.style.display = "block";
 
@@ -19,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Запускаємо гіроскоп
     initGyroscope();
-  });
+  }
 
   function initGyroscope() {
     console.log("Gyroscope initialized. Start shaking!");
@@ -30,11 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (y !== null) {
         const deltaY = lastY !== null ? Math.abs(y - lastY) : 0;
-        if (deltaY > threshold) {
-          shaking = true;
-        } else {
-          shaking = false;
-        }
+        shaking = deltaY > threshold;
         lastY = y;
       }
     });
