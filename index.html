@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App - Shake to Vibrate</title>
+  <title>Telegram Mini App - Gyroscope & Vibration</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -18,16 +18,41 @@
     h1 {
       text-align: center;
     }
-    .status {
+    .data {
       margin-top: 20px;
       font-size: 18px;
+      text-align: center;
       color: green;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 16px;
+      color: red;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:active {
+      background-color: #005bb5;
     }
   </style>
 </head>
 <body>
-  <h1>Shake Your Phone</h1>
-  <div class="status">Shake your phone to vibrate!</div>
+  <h1>Gyroscope & Vibration</h1>
+  <div class="data">
+    X: <span id="x">0</span> <br>
+    Y: <span id="y">0</span> <br>
+    Z: <span id="z">0</span>
+  </div>
+  <div class="status">Waiting for motion...</div>
+  <button id="vibrateButton">Vibrate</button>
 
   <script>
     // Ініціалізація Telegram Web App
@@ -35,6 +60,10 @@
     tg.ready();
 
     const statusDiv = document.querySelector('.status');
+    const xSpan = document.getElementById('x');
+    const ySpan = document.getElementById('y');
+    const zSpan = document.getElementById('z');
+    const vibrateButton = document.getElementById('vibrateButton');
 
     // Параметри для обробки струшування
     let lastShakeTime = 0;
@@ -42,25 +71,46 @@
     const timeThreshold = 500; // Мінімальний час між спрацьовуваннями (мс)
 
     // Обробник події руху
-    window.addEventListener('devicemotion', (event) => {
-      const acceleration = event.accelerationIncludingGravity;
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (event) => {
+        const acceleration = event.accelerationIncludingGravity;
 
-      if (!acceleration) return;
+        if (acceleration) {
+          // Відображаємо значення акселерометра
+          xSpan.textContent = acceleration.x.toFixed(2);
+          ySpan.textContent = acceleration.y.toFixed(2);
+          zSpan.textContent = acceleration.z.toFixed(2);
 
-      // Розраховуємо загальну силу руху
-      const totalForce = Math.sqrt(
-        acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
-      );
+          // Обчислюємо загальну силу руху
+          const totalForce = Math.sqrt(
+            acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
+          );
 
-      const currentTime = new Date().getTime();
+          const currentTime = new Date().getTime();
 
-      // Якщо сила перевищує поріг і достатньо часу минуло з останнього спрацьовування
-      if (totalForce > shakeThreshold && currentTime - lastShakeTime > timeThreshold) {
-        lastShakeTime = currentTime;
+          // Якщо сила перевищує поріг і достатньо часу минуло з останнього спрацьовування
+          if (totalForce > shakeThreshold && currentTime - lastShakeTime > timeThreshold) {
+            lastShakeTime = currentTime;
 
-        // Викликаємо тактильний відгук через Telegram API
-        tg.HapticFeedback.impactOccurred("medium"); // Середня вібрація
-        statusDiv.textContent = "Shake detected! Vibrating...";
+            // Викликаємо тактильний відгук через Telegram API
+            tg.HapticFeedback.impactOccurred("medium");
+            statusDiv.textContent = "Shake detected! Vibrating...";
+          } else {
+            statusDiv.textContent = "Waiting for motion...";
+          }
+        }
+      });
+    } else {
+      statusDiv.textContent = "DeviceMotionEvent is not supported on this device.";
+    }
+
+    // Обробка натискання на кнопку
+    vibrateButton.addEventListener('click', () => {
+      try {
+        tg.HapticFeedback.impactOccurred("medium");
+        statusDiv.textContent = "Vibration triggered via button!";
+      } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
       }
     });
   </script>
