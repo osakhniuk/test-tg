@@ -90,9 +90,17 @@
             acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
           );
 
-          if (totalForce > 15) {
-            tg.HapticFeedback.impactOccurred("medium");
-            statusDiv.textContent = "Shake detected! Vibrating...";
+          if (totalForce > 10) {
+            let intensity;
+            if (totalForce < 15) {
+              intensity = "light";
+            } else if (totalForce < 25) {
+              intensity = "medium";
+            } else {
+              intensity = "heavy";
+            }
+            tg.HapticFeedback.impactOccurred(intensity);
+            statusDiv.textContent = `Shake detected! Vibrating with intensity: ${intensity}`;
           } else {
             statusDiv.textContent = "Waiting for motion...";
           }
