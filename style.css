@@ -39,8 +39,13 @@ body, html {
   }
   
   .start-container {
+    position: absolute;
+    bottom: 50px; /* Відступ віднизу */
+    width: 100%;
     text-align: center;
+    z-index: 3;
   }
+  
   
   #startButton {
     font-size: 32px;
