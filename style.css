@@ -8,31 +8,38 @@ body, html {
     background-color: #fdf8f5;
   }
   
-  .overlay {
-    position: relative;
+  .tree-container {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5); /* Затемнення */
-  }
-  
-  .tree-container {
-    position: relative;
-    z-index: 1;
+    z-index: 0; /* Фон */
   }
   
   .tree {
-    max-width: 100%;
-    height: auto;
+    width: 90%;
+    max-height: 90%;
   }
   
-  /* Кнопка START */
-  .start-container {
+  .overlay {
     position: absolute;
-    bottom: 50px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Затемнення */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 2;
+  }
+  
+  .start-container {
+    text-align: center;
   }
   
   #startButton {
