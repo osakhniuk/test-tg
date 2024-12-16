@@ -51,9 +51,8 @@
     Y: <span id="y">0</span> <br>
     Z: <span id="z">0</span>
   </div>
-  <div class="status">Waiting for motion...</div>
-  <button id="vibrateButton">Vibrate</button>
-  <button id="enableMotion">Enable Motion</button>
+  <div class="status">Checking motion permissions...</div>
+  <button id="vibrateButton" style="display:none;">Vibrate</button>
 
   <script>
     // Ініціалізація Telegram Web App
@@ -65,7 +64,6 @@
     const ySpan = document.getElementById('y');
     const zSpan = document.getElementById('z');
     const vibrateButton = document.getElementById('vibrateButton');
-    const enableMotionButton = document.getElementById('enableMotion');
 
     let motionEnabled = false;
 
@@ -100,30 +98,37 @@
       });
     };
 
-    // Обробка натискання на кнопку активації сенсорів
-    enableMotionButton.addEventListener('click', async () => {
+    // Запит доступу до сенсорів
+    const requestMotionPermission = async () => {
       try {
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
-          const permission = await DeviceMotionEvent.requestPermission();
-          if (permission === 'granted') {
-            motionEnabled = true;
-            startMotionTracking();
-            enableMotionButton.style.display = 'none';
-            statusDiv.textContent = "Motion tracking enabled!";
+          const permission = localStorage.getItem('motionPermission');
+          if (permission !== 'granted') {
+            const result = await DeviceMotionEvent.requestPermission();
+            if (result === 'granted') {
+              localStorage.setItem('motionPermission', 'granted');
+              startMotionTracking();
+              statusDiv.textContent = "Motion tracking enabled!";
+            } else {
+              statusDiv.textContent = "Motion permission denied.";
+            }
           } else {
-            statusDiv.textContent = "Motion permission denied.";
+            startMotionTracking(); // Якщо дозвіл уже був наданий
+            statusDiv.textContent = "Motion tracking already enabled!";
           }
         } else {
-          // Якщо запит дозволу не потрібен (на Android)
-          motionEnabled = true;
+          // Якщо запит дозволу не потрібен (наприклад, Android)
           startMotionTracking();
-          enableMotionButton.style.display = 'none';
           statusDiv.textContent = "Motion tracking enabled!";
         }
+        vibrateButton.style.display = "block"; // Показуємо кнопку вібрації
       } catch (error) {
         statusDiv.textContent = `Error enabling motion: ${error.message}`;
       }
-    });
+    };
+
+    // Виклик запиту при завантаженні сторінки
+    window.addEventListener('DOMContentLoaded', requestMotionPermission);
 
     // Обробка натискання на кнопку вібрації
     vibrateButton.addEventListener('click', () => {
