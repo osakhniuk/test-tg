@@ -10,10 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const startButton = document.getElementById("startButton");
+  const overlay = document.getElementById("overlay");
+
 
   // Обробка кліку по кнопці START
   startButton.addEventListener("click", async () => {
-    console.log("START button clicked!");
 
     // Запит дозволу для iOS
     if (typeof DeviceMotionEvent.requestPermission === "function") {
@@ -36,6 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Gyroscope permission not required.");
       initGyroscope();
     }
+    document.body.classList.add("no-overlay");
+    startButton.classList.add("fade-out");
   });
 
   // Ініціалізація гіроскопа

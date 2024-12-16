@@ -1,17 +1,30 @@
-/* Скидання стандартних стилів браузера для всіх елементів */
+/* Скидання стандартних стилів */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
   
-  /* Загальні стилі для сторінки */
+  /* Загальні стилі */
   body, html {
     width: 100%;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-color: #fdf8f5; /* Світлий фон */
+    background-color: #fdf8f5;
     overflow: hidden;
+  }
+  
+  /* Затемнення фону через псевдоелемент */
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Чорне затемнення */
+    z-index: 1; /* Затемнення під кнопкою */
+    transition: opacity 0.5s ease; /* Плавне зникнення */
   }
   
   /* Контейнер з ялинкою */
@@ -24,6 +37,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 0; /* Ялинка під затемненням */
   }
   
   .tree {
@@ -37,28 +51,41 @@
     position: absolute;
     bottom: 50px; /* Відступ від нижнього краю */
     width: 100%;
-    text-align: center; /* Центруємо кнопку по горизонталі */
+    text-align: center;
+    z-index: 2; /* Кнопка над затемненням */
   }
   
   /* Стилі для кнопки START */
   #startButton {
-    all: unset; /* Видаляємо всі браузерні стилі кнопки */
-    display: block;
-    font-size: 48px; /* Великий розмір тексту */
-    font-weight: bold; /* Товстий шрифт */
-    text-transform: uppercase; /* Великі літери */
+    all: unset; /* Скидання стандартних стилів кнопки */
+    display: inline-block;
+    font-size: 48px;
+    font-weight: bold;
+    text-transform: uppercase;
     color: black; /* Чорний текст */
-    text-align: center; /* Текст по центру */
-    width: 100%; /* Повна ширина */
-    cursor: pointer; /* Курсор у вигляді руки */
-    margin: 0 auto; /* Центруємо кнопку */
+    text-align: center;
+    background-color: white; /* Білий фон кнопки */
+    padding: 10px 30px; /* Відступи кнопки */
+    border: 2px solid black; /* Чорна рамка */
+    cursor: pointer;
+    border-radius: 8px; /* Заокруглені кути */
+    transition: all 0.5s ease; /* Плавна анімація */
   }
   
-  /* Додаткові стилі на випадок наведення */
+  /* Підсвічування кнопки при наведенні */
   #startButton:hover {
-    opacity: 0.8; /* Злегка зменшуємо прозорість */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), /* Біле підсвічування */
+                0 0 10px rgba(0, 0, 0, 0.5); /* Тінь */
+    transform: scale(1.05); /* Легке збільшення кнопки */
   }
   
-  #startButton:active {
-    opacity: 0.6; /* Більше зменшуємо прозорість при натисканні */
+  .fade-out {
+    display: none !important; /* Повністю приховує елемент */
   }
+  
+  /* Клас для видалення затемнення */
+  .no-overlay::before {
+    opacity: 0; /* Плавне зникнення затемнення */
+    transition: opacity 0.5s ease;
+  }
+  
