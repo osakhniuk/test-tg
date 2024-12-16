@@ -3,141 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App - Gyroscope & Vibration</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      text-align: center;
-    }
-    .data {
-      margin-top: 20px;
-      font-size: 18px;
-      text-align: center;
-      color: green;
-    }
-    .status {
-      margin-top: 10px;
-      font-size: 16px;
-      color: red;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #0078d7;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:active {
-      background-color: #005bb5;
-    }
-  </style>
+  <title>Christmas Tree Game</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="scripts/script.js"></script>
 </head>
 <body>
-  <h1>Gyroscope & Vibration</h1>
-  <div class="data">
-    X: <span id="x">0</span> <br>
-    Y: <span id="y">0</span> <br>
-    Z: <span id="z">0</span>
+  <div class="overlay" id="overlay">
+    <div class="tree-container">
+      <img src="assets/tree.svg" alt="Christmas Tree" class="tree" id="tree">
+    </div>
+    <div class="start-container">
+      <button id="startButton">START</button>
+    </div>
   </div>
-  <div class="status">Waiting for motion...</div>
-  <button id="vibrateButton">Vibrate</button>
-  <button id="enableMotion">Enable Motion</button>
-
-  <script>
-    // Ініціалізація Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-
-    const statusDiv = document.querySelector('.status');
-    const xSpan = document.getElementById('x');
-    const ySpan = document.getElementById('y');
-    const zSpan = document.getElementById('z');
-    const vibrateButton = document.getElementById('vibrateButton');
-    const enableMotionButton = document.getElementById('enableMotion');
-
-    let motionEnabled = false;
-
-    // Функція для запуску обробника руху
-    const startMotionTracking = () => {
-      if (!window.DeviceMotionEvent) {
-        statusDiv.textContent = "DeviceMotionEvent is not supported.";
-        return;
-      }
-
-      window.addEventListener('devicemotion', (event) => {
-        const acceleration = event.accelerationIncludingGravity;
-
-        if (acceleration) {
-          // Відображаємо значення акселерометра
-          xSpan.textContent = acceleration.x.toFixed(2);
-          ySpan.textContent = acceleration.y.toFixed(2);
-          zSpan.textContent = acceleration.z.toFixed(2);
-
-          // Обчислюємо загальну силу руху
-          const totalForce = Math.sqrt(
-            acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
-          );
-
-          if (totalForce > 10) {
-            let intensity;
-            if (totalForce < 15) {
-              intensity = "light";
-            } else if (totalForce < 25) {
-              intensity = "medium";
-            } else {
-              intensity = "heavy";
-            }
-            tg.HapticFeedback.impactOccurred(intensity);
-            statusDiv.textContent = `Shake detected! Vibrating with intensity: ${intensity}`;
-          } else {
-            statusDiv.textContent = "Waiting for motion...";
-          }
-        }
-      });
-    };
-
-    // Обробка натискання на кнопку активації сенсорів
-    enableMotionButton.addEventListener('click', async () => {
-      try {
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-          const permission = await DeviceMotionEvent.requestPermission();
-          if (permission === 'granted') {
-            motionEnabled = true;
-            startMotionTracking();
-            enableMotionButton.style.display = 'none';
-            statusDiv.textContent = "Motion tracking enabled!";
-          } else {
-            statusDiv.textContent = "Motion permission denied.";
-          }
-        } else {
-          // Якщо запит дозволу не потрібен (на Android)
-          motionEnabled = true;
-          startMotionTracking();
-          enableMotionButton.style.display = 'none';
-          statusDiv.textContent = "Motion tracking enabled!";
-        }
-      } catch (error) {
-        statusDiv.textContent = `Error enabling motion: ${error.message}`;
-      }
-    });
-
-    // Обробка натискання на кнопку вібрації
-    vibrateButton.addEventListener('click', () => {
-      tg.HapticFeedback.impactOccurred("medium");
-      statusDiv.textContent = "Vibration triggered via button!";
-    });
-  </script>
 </body>
 </html>
