@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App - Gyroscope Data</title>
+  <title>Telegram Mini App - Shake to Vibrate</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -18,27 +18,16 @@
     h1 {
       text-align: center;
     }
-    .data {
+    .status {
       margin-top: 20px;
       font-size: 18px;
-      text-align: center;
       color: green;
-    }
-    .status {
-      margin-top: 10px;
-      font-size: 16px;
-      color: red;
     }
   </style>
 </head>
 <body>
-  <h1>Gyroscope Data</h1>
-  <div class="data">
-    X: <span id="x">0</span> <br>
-    Y: <span id="y">0</span> <br>
-    Z: <span id="z">0</span>
-  </div>
-  <div class="status">Waiting for motion...</div>
+  <h1>Shake Your Phone</h1>
+  <div class="status">Shake your phone to vibrate!</div>
 
   <script>
     // Ініціалізація Telegram Web App
@@ -46,36 +35,34 @@
     tg.ready();
 
     const statusDiv = document.querySelector('.status');
-    const xSpan = document.getElementById('x');
-    const ySpan = document.getElementById('y');
-    const zSpan = document.getElementById('z');
 
-    // Перевіряємо підтримку події DeviceMotion
-    if (window.DeviceMotionEvent) {
-      window.addEventListener('devicemotion', (event) => {
-        const acceleration = event.accelerationIncludingGravity;
+    // Параметри для обробки струшування
+    let lastShakeTime = 0;
+    const shakeThreshold = 15; // Порог для чутливості
+    const timeThreshold = 500; // Мінімальний час між спрацьовуваннями (мс)
 
-        if (acceleration) {
-          // Відображаємо значення
-          xSpan.textContent = acceleration.x.toFixed(2);
-          ySpan.textContent = acceleration.y.toFixed(2);
-          zSpan.textContent = acceleration.z.toFixed(2);
+    // Обробник події руху
+    window.addEventListener('devicemotion', (event) => {
+      const acceleration = event.accelerationIncludingGravity;
 
-          // Якщо рух перевищує певний поріг, викликаємо вібрацію
-          const totalForce = Math.sqrt(
-            acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
-          );
-          if (totalForce > 15) { // Поріг руху
-            tg.HapticFeedback.impactOccurred("medium"); // Виклик вібрації через Telegram API
-            statusDiv.textContent = "Shake detected! Vibrating...";
-          } else {
-            statusDiv.textContent = "Waiting for motion...";
-          }
-        }
-      });
-    } else {
-      statusDiv.textContent = "DeviceMotionEvent is not supported on this device.";
-    }
+      if (!acceleration) return;
+
+      // Розраховуємо загальну силу руху
+      const totalForce = Math.sqrt(
+        acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
+      );
+
+      const currentTime = new Date().getTime();
+
+      // Якщо сила перевищує поріг і достатньо часу минуло з останнього спрацьовування
+      if (totalForce > shakeThreshold && currentTime - lastShakeTime > timeThreshold) {
+        lastShakeTime = currentTime;
+
+        // Викликаємо тактильний відгук через Telegram API
+        tg.HapticFeedback.impactOccurred("medium"); // Середня вібрація
+        statusDiv.textContent = "Shake detected! Vibrating...";
+      }
+    });
   </script>
 </body>
 </html>
