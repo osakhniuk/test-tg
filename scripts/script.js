@@ -1,4 +1,3 @@
-// Ініціалізація скрипта після завантаження DOM
 document.addEventListener("DOMContentLoaded", () => {
   const startButton = document.getElementById("startButton");
 
@@ -28,6 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Ініціалізація гіроскопа
   function initGyroscope() {
+    alert("Gyroscope initialized. Start shaking!");
+
     window.addEventListener("devicemotion", (event) => {
       const acceleration = event.accelerationIncludingGravity;
 
@@ -38,13 +39,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log(`Total Force: ${totalForce}`);
 
+        // Показуємо поточне значення сили руху
+        alert(`Total Force: ${totalForce}`);
+
         // Вібрація при сильному русі
-        if (totalForce > 15) {
+        if (totalForce > 10) { // Знижуємо поріг для тесту
           if (window.navigator.vibrate) {
             window.navigator.vibrate(200); // Тривалість вібрації 200 мс
-            console.log("Vibration triggered!");
+            alert("Vibration triggered!");
+          } else {
+            alert("Vibration API is not supported on this device.");
           }
         }
+      } else {
+        console.warn("No acceleration data available.");
       }
     });
   }
