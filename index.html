@@ -5,9 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Christmas Tree Mini App</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Telegram Mini App API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+  <!-- Блок для рахунку -->
+  <div class="score-container">
+    <span class="score-label">CURRENT SCORE:</span>
+    <span id="scoreValue">0</span>
+  </div>
+
   <!-- Затемнення фону -->
   <div class="overlay" id="overlay"></div>
 
@@ -20,7 +27,6 @@
   <div class="start-container">
     <button id="startButton">START</button>
   </div>
-
   <script src="scripts/script.js"></script>
 </body>
 </html>

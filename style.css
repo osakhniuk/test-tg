@@ -88,4 +88,26 @@
     opacity: 0; /* Плавне зникнення затемнення */
     transition: opacity 0.5s ease;
   }
+  /* Стиль для контейнера рахунку */
+.score-container {
+    position: absolute;
+    top: 20px; /* Відступ зверху */
+    left: 20px; /* Відступ зліва */
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    z-index: 3; /* Над іншими елементами */
+    display: none; /* Сховати за замовчуванням */
+  }
+  
+  /* Стиль для мітки CURRENT SCORE */
+  .score-label {
+    text-transform: uppercase; /* Великі літери */
+  }
+  
+  /* Стиль для значення рахунку */
+  #scoreValue {
+    color: #ff5722; /* Помаранчевий колір */
+    margin-left: 5px;
+  }
   
