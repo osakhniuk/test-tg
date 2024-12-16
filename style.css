@@ -2,12 +2,14 @@
 body, html {
     margin: 0;
     padding: 0;
+    width: 100%;
     height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
     background-color: #fdf8f5;
   }
   
+  /* Контейнер з ялинкою */
   .tree-container {
     position: absolute;
     top: 0;
@@ -17,48 +19,35 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 0; /* Фон */
   }
   
   .tree {
     width: 90%;
     max-height: 90%;
+    object-fit: contain;
   }
   
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Затемнення */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
-  }
-  
+  /* Кнопка START */
   .start-container {
     position: absolute;
-    bottom: 50px; /* Відступ віднизу */
+    bottom: 50px;
     width: 100%;
     text-align: center;
-    z-index: 3;
   }
-  
   
   #startButton {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
-    color: #000;
-    background-color: #fff;
+    color: white;
+    background-color: #0078d7;
     border: none;
-    padding: 15px 30px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: opacity 0.5s ease;
+    transition: background-color 0.3s ease;
   }
   
-  #startButton:active {
-    background-color: #f0f0f0;
+  #startButton:hover {
+    background-color: #005bb5;
   }
   

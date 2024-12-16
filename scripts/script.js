@@ -1,96 +1,51 @@
+// Ініціалізація скрипта після завантаження DOM
 document.addEventListener("DOMContentLoaded", () => {
-    const startButton = document.getElementById("startButton");
-    const overlay = document.getElementById("overlay");
-    const statusDiv = document.createElement("div");
-  
-    // Створюємо блок для статусу (візуальні підказки)
-    statusDiv.style.position = "absolute";
-    statusDiv.style.top = "20px";
-    statusDiv.style.left = "50%";
-    statusDiv.style.transform = "translateX(-50%)";
-    statusDiv.style.padding = "10px";
-    statusDiv.style.backgroundColor = "#fff";
-    statusDiv.style.color = "#000";
-    statusDiv.style.border = "1px solid #ccc";
-    statusDiv.style.zIndex = "10";
-    document.body.appendChild(statusDiv);
-  
-    function updateStatus(message) {
-      statusDiv.textContent = message;
-    }
-  
-    // Ініціалізація Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    updateStatus("Telegram WebApp initialized");
-  
-    // Обробник кліку по кнопці START
-    startButton.addEventListener("click", async () => {
-      updateStatus("START button clicked");
-  
-      // Анімація зникнення кнопки
-      startButton.style.transition = "opacity 0.5s ease";
-      startButton.style.opacity = "0";
-  
-      // Запит дозволу до гіроскопа
+  const startButton = document.getElementById("startButton");
+
+  // Обробка кліку по кнопці START
+  startButton.addEventListener("click", async () => {
+    alert("Requesting gyroscope access...");
+
+    // Запит дозволу для iOS
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
       try {
-        if (typeof DeviceMotionEvent.requestPermission === "function") {
-          updateStatus("Requesting gyroscope permission...");
-          const permission = await DeviceMotionEvent.requestPermission();
-          if (permission === "granted") {
-            updateStatus("Gyroscope access granted!");
-            initGyroscope();
-            hideOverlay();
-          } else {
-            updateStatus("Access to gyroscope denied.");
-          }
-        } else {
-          updateStatus("Gyroscope does not require permission.");
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission === "granted") {
+          alert("Gyroscope access granted!");
           initGyroscope();
-          hideOverlay();
+        } else {
+          alert("Gyroscope access denied.");
         }
       } catch (e) {
-        updateStatus(`Error: ${e.message}`);
+        console.error("Error requesting gyroscope permission:", e);
+        alert("Error: Could not access gyroscope.");
       }
-    });
-  
-    // Прибираємо затемнення
-    function hideOverlay() {
-      setTimeout(() => {
-        overlay.style.display = "none";
-        updateStatus("Overlay hidden. Ready to shake!");
-      }, 500);
-    }
-  
-    // Обробка даних гіроскопа
-    function initGyroscope() {
-      updateStatus("Initializing gyroscope...");
-  
-      window.addEventListener("devicemotion", (event) => {
-        const acceleration = event.accelerationIncludingGravity;
-  
-        if (acceleration) {
-          const totalForce = Math.sqrt(
-            acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
-          );
-  
-          updateStatus(`Total Force: ${totalForce.toFixed(2)}`);
-  
-          // Вібрація в залежності від сили руху
-          if (totalForce > 15) {
-            let intensity = "light";
-            if (totalForce >= 20 && totalForce < 30) intensity = "medium";
-            if (totalForce >= 30) intensity = "heavy";
-  
-            tg.HapticFeedback.impactOccurred(intensity);
-            updateStatus(`Vibration triggered: ${intensity}`);
-          }
-        } else {
-          updateStatus("No acceleration data available.");
-        }
-      });
-  
-      updateStatus("Gyroscope listener added. Shake the phone!");
+    } else {
+      // Для Android або платформ без обмежень
+      initGyroscope();
     }
   });
-  
+
+  // Ініціалізація гіроскопа
+  function initGyroscope() {
+    window.addEventListener("devicemotion", (event) => {
+      const acceleration = event.accelerationIncludingGravity;
+
+      if (acceleration) {
+        const totalForce = Math.sqrt(
+          acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
+        );
+
+        console.log(`Total Force: ${totalForce}`);
+
+        // Вібрація при сильному русі
+        if (totalForce > 15) {
+          if (window.navigator.vibrate) {
+            window.navigator.vibrate(200); // Тривалість вібрації 200 мс
+            console.log("Vibration triggered!");
+          }
+        }
+      }
+    });
+  }
+});
