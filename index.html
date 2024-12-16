@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App - Gyroscope & Vibration</title>
+  <title>Telegram Mini App - Motion Debug</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -45,7 +45,7 @@
   </style>
 </head>
 <body>
-  <h1>Gyroscope & Vibration</h1>
+  <h1>Gyroscope & Vibration Debug</h1>
   <div class="data">
     X: <span id="x">0</span> <br>
     Y: <span id="y">0</span> <br>
@@ -53,9 +53,9 @@
   </div>
   <div class="status">Checking motion permissions...</div>
   <button id="vibrateButton" style="display:none;">Vibrate</button>
+  <button id="resetPermission" style="margin-top:10px;">Reset Permission</button>
 
   <script>
-    // Ініціалізація Telegram Web App
     const tg = window.Telegram.WebApp;
     tg.ready();
 
@@ -64,10 +64,8 @@
     const ySpan = document.getElementById('y');
     const zSpan = document.getElementById('z');
     const vibrateButton = document.getElementById('vibrateButton');
+    const resetPermissionButton = document.getElementById('resetPermission');
 
-    let motionEnabled = false;
-
-    // Функція для запуску обробника руху
     const startMotionTracking = () => {
       if (!window.DeviceMotionEvent) {
         statusDiv.textContent = "DeviceMotionEvent is not supported.";
@@ -78,12 +76,10 @@
         const acceleration = event.accelerationIncludingGravity;
 
         if (acceleration) {
-          // Відображаємо значення акселерометра
           xSpan.textContent = acceleration.x.toFixed(2);
           ySpan.textContent = acceleration.y.toFixed(2);
           zSpan.textContent = acceleration.z.toFixed(2);
 
-          // Обчислюємо загальну силу руху
           const totalForce = Math.sqrt(
             acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
           );
@@ -94,46 +90,44 @@
           } else {
             statusDiv.textContent = "Waiting for motion...";
           }
+        } else {
+          statusDiv.textContent = "No motion data available.";
         }
       });
     };
 
-    // Запит доступу до сенсорів
     const requestMotionPermission = async () => {
-      try {
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-          const permission = localStorage.getItem('motionPermission');
-          if (permission !== 'granted') {
-            const result = await DeviceMotionEvent.requestPermission();
-            if (result === 'granted') {
-              localStorage.setItem('motionPermission', 'granted');
-              startMotionTracking();
-              statusDiv.textContent = "Motion tracking enabled!";
-            } else {
-              statusDiv.textContent = "Motion permission denied.";
-            }
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          const result = await DeviceMotionEvent.requestPermission();
+          if (result === 'granted') {
+            startMotionTracking();
+            statusDiv.textContent = "Motion tracking enabled!";
           } else {
-            startMotionTracking(); // Якщо дозвіл уже був наданий
-            statusDiv.textContent = "Motion tracking already enabled!";
+            statusDiv.textContent = "Motion permission denied.";
           }
-        } else {
-          // Якщо запит дозволу не потрібен (наприклад, Android)
-          startMotionTracking();
-          statusDiv.textContent = "Motion tracking enabled!";
+        } catch (error) {
+          statusDiv.textContent = `Error enabling motion: ${error.message}`;
         }
-        vibrateButton.style.display = "block"; // Показуємо кнопку вібрації
-      } catch (error) {
-        statusDiv.textContent = `Error enabling motion: ${error.message}`;
+      } else {
+        startMotionTracking();
+        statusDiv.textContent = "Motion tracking enabled!";
       }
     };
 
-    // Виклик запиту при завантаженні сторінки
+    // Автоматичний запит дозволу
     window.addEventListener('DOMContentLoaded', requestMotionPermission);
 
-    // Обробка натискання на кнопку вібрації
+    // Кнопка вібрації
     vibrateButton.addEventListener('click', () => {
       tg.HapticFeedback.impactOccurred("medium");
       statusDiv.textContent = "Vibration triggered via button!";
+    });
+
+    // Скидання дозволів
+    resetPermissionButton.addEventListener('click', () => {
+      localStorage.removeItem('motionPermission');
+      statusDiv.textContent = "Motion permission reset. Reload to request again.";
     });
   </script>
 </body>
