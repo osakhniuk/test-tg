@@ -27,27 +27,24 @@ body, html {
     object-fit: contain;
   }
   
-  /* Кнопка START */
+  /* Контейнер для кнопки START */
   .start-container {
     position: absolute;
-    bottom: 50px;
+    bottom: 50px; /* Відступ від нижнього краю */
     width: 100%;
-    text-align: center;
+    text-align: center; /* Центруємо кнопку по горизонталі */
   }
   
+  /* Стилі для кнопки START */
   #startButton {
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-    background-color: #0078d7;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    background-color: white; /* Білий фон */
+    color: black; /* Чорний текст */
+    font-size: 32px; /* Великий розмір шрифту */
+    font-weight: bold; /* Товстий шрифт */
+    border: none; /* Без рамки */
+    padding: 10px 0; /* Внутрішній відступ по вертикалі */
+    width: 100%; /* Повна ширина */
+    text-align: center; /* Текст по центру */
     cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  #startButton:hover {
-    background-color: #005bb5;
   }
   
