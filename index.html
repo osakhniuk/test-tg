@@ -53,6 +53,7 @@
   </div>
   <div class="status">Waiting for motion...</div>
   <button id="vibrateButton">Vibrate</button>
+  <button id="enableMotion">Enable Motion</button>
 
   <script>
     // Ініціалізація Telegram Web App
@@ -64,14 +65,17 @@
     const ySpan = document.getElementById('y');
     const zSpan = document.getElementById('z');
     const vibrateButton = document.getElementById('vibrateButton');
+    const enableMotionButton = document.getElementById('enableMotion');
 
-    // Параметри для обробки струшування
-    let lastShakeTime = 0;
-    const shakeThreshold = 15; // Порог для чутливості
-    const timeThreshold = 500; // Мінімальний час між спрацьовуваннями (мс)
+    let motionEnabled = false;
 
-    // Обробник події руху
-    if (window.DeviceMotionEvent) {
+    // Функція для запуску обробника руху
+    const startMotionTracking = () => {
+      if (!window.DeviceMotionEvent) {
+        statusDiv.textContent = "DeviceMotionEvent is not supported.";
+        return;
+      }
+
       window.addEventListener('devicemotion', (event) => {
         const acceleration = event.accelerationIncludingGravity;
 
@@ -86,13 +90,7 @@
             acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2
           );
 
-          const currentTime = new Date().getTime();
-
-          // Якщо сила перевищує поріг і достатньо часу минуло з останнього спрацьовування
-          if (totalForce > shakeThreshold && currentTime - lastShakeTime > timeThreshold) {
-            lastShakeTime = currentTime;
-
-            // Викликаємо тактильний відгук через Telegram API
+          if (totalForce > 15) {
             tg.HapticFeedback.impactOccurred("medium");
             statusDiv.textContent = "Shake detected! Vibrating...";
           } else {
@@ -100,18 +98,37 @@
           }
         }
       });
-    } else {
-      statusDiv.textContent = "DeviceMotionEvent is not supported on this device.";
-    }
+    };
 
-    // Обробка натискання на кнопку
-    vibrateButton.addEventListener('click', () => {
+    // Обробка натискання на кнопку активації сенсорів
+    enableMotionButton.addEventListener('click', async () => {
       try {
-        tg.HapticFeedback.impactOccurred("medium");
-        statusDiv.textContent = "Vibration triggered via button!";
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+          const permission = await DeviceMotionEvent.requestPermission();
+          if (permission === 'granted') {
+            motionEnabled = true;
+            startMotionTracking();
+            enableMotionButton.style.display = 'none';
+            statusDiv.textContent = "Motion tracking enabled!";
+          } else {
+            statusDiv.textContent = "Motion permission denied.";
+          }
+        } else {
+          // Якщо запит дозволу не потрібен (на Android)
+          motionEnabled = true;
+          startMotionTracking();
+          enableMotionButton.style.display = 'none';
+          statusDiv.textContent = "Motion tracking enabled!";
+        }
       } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.textContent = `Error enabling motion: ${error.message}`;
       }
+    });
+
+    // Обробка натискання на кнопку вібрації
+    vibrateButton.addEventListener('click', () => {
+      tg.HapticFeedback.impactOccurred("medium");
+      statusDiv.textContent = "Vibration triggered via button!";
     });
   </script>
 </body>
