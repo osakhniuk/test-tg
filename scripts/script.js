@@ -1,23 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const startButton = document.getElementById("startButton");
-
-  // Ініціалізація Telegram Web App
+  // Ініціалізація Telegram Web App API
   const tg = window.Telegram.WebApp;
-  tg.ready();
+
+  if (tg) {
+    tg.ready();
+    console.log("Telegram API initialized successfully!");
+  } else {
+    console.error("Telegram API is not available!");
+  }
+
+  const startButton = document.getElementById("startButton");
 
   // Обробка кліку по кнопці START
   startButton.addEventListener("click", async () => {
-    alert("Requesting gyroscope access...");
+    console.log("START button clicked!");
 
     // Запит дозволу для iOS
     if (typeof DeviceMotionEvent.requestPermission === "function") {
       try {
+        console.log("Requesting gyroscope permission...");
         const permission = await DeviceMotionEvent.requestPermission();
         if (permission === "granted") {
-          alert("Gyroscope access granted!");
+          console.log("Gyroscope access granted!");
           initGyroscope();
         } else {
-          alert("Gyroscope access denied.");
+          alert("Access to gyroscope denied.");
+          console.error("Gyroscope permission denied.");
         }
       } catch (e) {
         console.error("Error requesting gyroscope permission:", e);
@@ -25,13 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } else {
       // Для Android або платформ без обмежень
+      console.log("Gyroscope permission not required.");
       initGyroscope();
     }
   });
 
   // Ініціалізація гіроскопа
   function initGyroscope() {
-    alert("Gyroscope initialized. Start shaking!");
+    console.log("Gyroscope initialized. Start shaking!");
 
     window.addEventListener("devicemotion", (event) => {
       const acceleration = event.accelerationIncludingGravity;
@@ -43,9 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log(`Total Force: ${totalForce}`);
 
-        // Показуємо поточне значення сили руху
-        alert(`Total Force: ${totalForce}`);
-
         // Вібрація через Telegram API при сильному русі
         if (totalForce > 10) { // Порог сили тряски
           let intensity = "light";
@@ -53,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (totalForce >= 30) intensity = "heavy";
 
           tg.HapticFeedback.impactOccurred(intensity);
-          alert(`Vibration triggered with intensity: ${intensity}`);
+          console.log(`Vibration triggered with intensity: ${intensity}`);
         }
       } else {
         console.warn("No acceleration data available.");
