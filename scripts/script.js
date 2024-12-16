@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const startButton = document.getElementById("startButton");
 
+  // Ініціалізація Telegram Web App
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+
   // Обробка кліку по кнопці START
   startButton.addEventListener("click", async () => {
     alert("Requesting gyroscope access...");
@@ -42,14 +46,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Показуємо поточне значення сили руху
         alert(`Total Force: ${totalForce}`);
 
-        // Вібрація при сильному русі
-        if (totalForce > 10) { // Знижуємо поріг для тесту
-          if (window.navigator.vibrate) {
-            window.navigator.vibrate(200); // Тривалість вібрації 200 мс
-            alert("Vibration triggered!");
-          } else {
-            alert("Vibration API is not supported on this device.");
-          }
+        // Вібрація через Telegram API при сильному русі
+        if (totalForce > 10) { // Порог сили тряски
+          let intensity = "light";
+          if (totalForce >= 20 && totalForce < 30) intensity = "medium";
+          if (totalForce >= 30) intensity = "heavy";
+
+          tg.HapticFeedback.impactOccurred(intensity);
+          alert(`Vibration triggered with intensity: ${intensity}`);
         }
       } else {
         console.warn("No acceleration data available.");
