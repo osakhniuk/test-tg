@@ -51,6 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Виявлення трясіння
         if (deltaY > threshold) {
           shaking = true;
+
+          // Викликаємо вібрацію через Telegram API
+          if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+          }
         } else {
           shaking = false;
         }
@@ -58,12 +63,16 @@ document.addEventListener("DOMContentLoaded", () => {
         lastY = y;
 
         // Оновлюємо дебаг-інформацію на екрані
-        debugInfo.textContent = `Shaking: ${shaking}`;
+        debugInfo.textContent = `
+          X: ${x ? x.toFixed(2) : 0}, 
+          Y: ${y ? y.toFixed(2) : 0}, 
+          Z: ${z ? z.toFixed(2) : 0}, 
+          DeltaY: ${deltaY.toFixed(2)}, 
+          Shaking: ${shaking}, 
+          Score: ${score}
+        `;
       }
-    });
-
-    // Починаємо нарахування балів
-   
+    }); 
   }
 
  
