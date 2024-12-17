@@ -44,11 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function initGyroscope() {
-    console.log("Gyroscope initialized. Start shaking!");
 
     window.addEventListener("devicemotion", (event) => {
       const { x, y, z } = event.accelerationIncludingGravity || {};
-      const threshold = 15; // Порогове значення для трясіння
+      const threshold = 5; // Порогове значення для трясіння
 
       if (y !== null) {
         const deltaY = lastY !== null ? Math.abs(y - lastY) : 0;
